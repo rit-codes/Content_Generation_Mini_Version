@@ -18,6 +18,11 @@ public class ContentEntity {
     private String imageJSON;
     @Lob
     private String generatedContent;
+    @Lob
+    private String summary;
+    @Lob
+    private String keywords;  // will store comma-separated
+
 
     public Long getId() {
         return id;
@@ -83,6 +88,22 @@ public class ContentEntity {
         this.generatedContent = generatedContent;
     }
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
     @Override
     public String toString() {
         return "ContentEntity{" +
@@ -94,6 +115,8 @@ public class ContentEntity {
                 ", meta='" + meta + '\'' +
                 ", imageJSON='" + imageJSON + '\'' +
                 ", generatedContent='" + generatedContent + '\'' +
+                ", summary='" + summary + '\'' +
+                ", keywords='" + keywords + '\'' +
                 '}';
     }
 }
