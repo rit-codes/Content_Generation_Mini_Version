@@ -1,5 +1,6 @@
 package com.MiniContentGenerator.ContentGenerator.controller;
 
+import com.MiniContentGenerator.ContentGenerator.dto.ContentResponseDTO;
 import com.MiniContentGenerator.ContentGenerator.dto.ProductRequest;
 import com.MiniContentGenerator.ContentGenerator.model.ContentEntity;
 import com.MiniContentGenerator.ContentGenerator.service.ContentService;
@@ -27,8 +28,12 @@ public class ContentController {
         return contentService.getContentById(id);
     }
     @GetMapping("/all")
-public List<ContentEntity> getAllContent(){
+    public List<ContentEntity> getAllContent(){
         return contentService.getAllContent();
+    }
+    @GetMapping("/detailed/{id}")
+    public ContentResponseDTO getContentDetailsById(@PathVariable Long id){
+        return contentService.getContentDetailsById(id);
     }
 
 }
