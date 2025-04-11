@@ -2,6 +2,8 @@ package com.MiniContentGenerator.ContentGenerator.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class ContentEntity {
     @Id
@@ -23,6 +25,16 @@ public class ContentEntity {
     @Lob
     private String keywords;  // will store comma-separated
 
+    @Column(name = "created_timestamp", nullable = false)
+    private LocalDateTime createdTimestamp;
+
+    public LocalDateTime getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(LocalDateTime createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
 
     public Long getId() {
         return id;
@@ -117,6 +129,7 @@ public class ContentEntity {
                 ", generatedContent='" + generatedContent + '\'' +
                 ", summary='" + summary + '\'' +
                 ", keywords='" + keywords + '\'' +
+                ", createdTimestamp=" + createdTimestamp +
                 '}';
     }
 }
