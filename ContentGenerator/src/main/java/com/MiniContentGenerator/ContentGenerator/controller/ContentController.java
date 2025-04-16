@@ -2,6 +2,7 @@ package com.MiniContentGenerator.ContentGenerator.controller;
 
 import com.MiniContentGenerator.ContentGenerator.dto.ContentResponseDTO;
 import com.MiniContentGenerator.ContentGenerator.dto.ProductRequest;
+import com.MiniContentGenerator.ContentGenerator.dto.PromptRequestDTO;
 import com.MiniContentGenerator.ContentGenerator.model.ContentEntity;
 import com.MiniContentGenerator.ContentGenerator.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,16 @@ public class ContentController {
     public ContentResponseDTO getContentDetailsById(@PathVariable Long id){
         return contentService.getContentDetailsById(id);
     }
+    @GetMapping("/ack/{ackId}")
+    public ContentResponseDTO getContentByAck(@PathVariable String ackId) {
+    return contentService.getContentByAckId(ackId);
+    }
+    @PostMapping("/generate/final")
+    public ResponseEntity<String> generateFinalContent(@RequestBody PromptRequestDTO request) {
+        String response = contentService.generateContentFromPrompt(request);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

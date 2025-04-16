@@ -13,6 +13,8 @@ public class ContentEntity {
     private String content;
     private String templateName;
     private String concept;
+    private String ackId;
+
 
     @Lob
     private String meta;
@@ -116,6 +118,14 @@ public class ContentEntity {
         this.keywords = keywords;
     }
 
+    public String getAckId() {
+        return ackId;
+    }
+
+    public void setAckId(String ackId) {
+        this.ackId = ackId;
+    }
+
     @Override
     public String toString() {
         return "ContentEntity{" +
@@ -124,6 +134,7 @@ public class ContentEntity {
                 ", content='" + content + '\'' +
                 ", templateName='" + templateName + '\'' +
                 ", concept='" + concept + '\'' +
+                ", ackId='" + ackId + '\'' +
                 ", meta='" + meta + '\'' +
                 ", imageJSON='" + imageJSON + '\'' +
                 ", generatedContent='" + generatedContent + '\'' +
