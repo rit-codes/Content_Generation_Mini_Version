@@ -21,6 +21,10 @@ public class ContentService {
     // so we need instance of ContentRepository, and hence we need Autowire
     @Autowired
     private ContentRepository contentRepository;
+    @Autowired
+    private PromptBuilderService promptBuilderService;
+    @Autowired
+    private GptSimulatorService gptSimulatorService;
 
     public String generateContent(ProductRequest request) {
 
@@ -112,6 +116,30 @@ public class ContentService {
         }
     }
 
+    public ContentResponseDTO getContentByAckId(String ackId){
+        Optional<ContentEntity> optionalContentEntity = contentRepository.findByAckId(ackId);
+        if (optionalContentEntity.isPresent()) {
+            ContentEntity entity = optionalContentEntity.get();
+            ObjectMapper jsonResponseMapper = new ObjectMapper();
+            try {
+                Meta metaObject = jsonResponseMapper.readValue(entity.getMeta(), Meta.class);
+                ImageJSON imageObject = jsonResponseMapper.readValue(entity.getImageJSON(), ImageJSON.class);
+                ContentResponseDTO contentResponseDTO = new ContentResponseDTO();
+                contentResponseDTO.setContent(entity.getContent());
+                contentResponseDTO.setSummary(entity.getSummary());
+                contentResponseDTO.setKeywords(entity.getKeywords());
+                contentResponseDTO.setMeta(metaObject);
+                contentResponseDTO.setImageJSON(imageObject);
+                return contentResponseDTO;
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to parse JSON fields", e);
+            }
+        }
+        else{
+            return null;
+        }
+    }
+
     public String getContentById(Long id){
         Optional<ContentEntity> optionalContentEntity = contentRepository.findById(id);
         if (optionalContentEntity.isPresent()) {
@@ -122,6 +150,13 @@ public class ContentService {
             return "Entity not found for ID: " + id;
         }
     }
+
+    public String generateContentFromPrompt(PromptRequestDTO request) {
+        PromptResponseDTO prompt = promptBuilderService.buildPrompt(request);
+        ContentEntity savedEntity = gptSimulatorService.simulateAndStoreGptResponse(prompt.getAckID(), request);
+        return "Content saved with AckID: " + savedEntity.getAckId();
+    }
+
 
     public List<ContentEntity> getAllContent(){
         return contentRepository.findAll();
