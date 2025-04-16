@@ -2,6 +2,7 @@ package com.MiniContentGenerator.ContentGenerator.service;
 
 import com.MiniContentGenerator.ContentGenerator.dto.*;
 import com.MiniContentGenerator.ContentGenerator.model.ContentEntity;
+import com.MiniContentGenerator.ContentGenerator.model.TokenUsageEntity;
 import com.MiniContentGenerator.ContentGenerator.repository.ContentRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +26,10 @@ public class ContentService {
     private PromptBuilderService promptBuilderService;
     @Autowired
     private GptSimulatorService gptSimulatorService;
+    @Autowired
+    WebhookPushService webhookPushService;
+    @Autowired
+    private TokenUsageService tokenUsageService;
 
     public String generateContent(ProductRequest request) {
 
@@ -115,6 +120,23 @@ public class ContentService {
            return null;
         }
     }
+    private ContentResponseDTO convertEntityToDTO(ContentEntity entity) {
+        ObjectMapper jsonResponseMapper = new ObjectMapper();
+        try {
+            Meta metaObject = jsonResponseMapper.readValue(entity.getMeta(), Meta.class);
+            ImageJSON imageObject = jsonResponseMapper.readValue(entity.getImageJSON(), ImageJSON.class);
+            ContentResponseDTO contentResponseDTO = new ContentResponseDTO();
+            contentResponseDTO.setContent(entity.getContent());
+            contentResponseDTO.setSummary(entity.getSummary());
+            contentResponseDTO.setKeywords(entity.getKeywords());
+            contentResponseDTO.setMeta(metaObject);
+            contentResponseDTO.setImageJSON(imageObject);
+            return contentResponseDTO;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse JSON fields", e);
+        }
+    }
+
 
     public ContentResponseDTO getContentByAckId(String ackId){
         Optional<ContentEntity> optionalContentEntity = contentRepository.findByAckId(ackId);
@@ -154,6 +176,9 @@ public class ContentService {
     public String generateContentFromPrompt(PromptRequestDTO request) {
         PromptResponseDTO prompt = promptBuilderService.buildPrompt(request);
         ContentEntity savedEntity = gptSimulatorService.simulateAndStoreGptResponse(prompt.getAckID(), request);
+        ContentResponseDTO responseDTO = convertEntityToDTO(savedEntity);
+        tokenUsageService.saveTokenUsage(prompt.getAckID(), 45, 60);
+        webhookPushService.sendToWebhook(responseDTO);
         return "Content saved with AckID: " + savedEntity.getAckId();
     }
 
